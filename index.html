@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Revolut</title>
     <style>
+        /* Basic styles */
         body {
-            font-family: sans-serif;
+            font-family: 'Arial', sans-serif;
+            background: #f3f6f9;
             margin: 0;
             padding: 0;
-            text-align: center;
-            background: #f4f4f4;
         }
         #splash-screen {
             position: fixed;
@@ -23,10 +23,63 @@
             align-items: center;
         }
         #splash-screen img {
-            width: 120px;
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        #splash-screen p {
+            font-size: 20px;
+            color: #333;
         }
         #app {
             display: none;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #app h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        #app h2 {
+            font-size: 22px;
+            color: #2f84f7;
+        }
+        #balance {
+            font-weight: bold;
+            font-size: 30px;
+            color: #2f84f7;
+        }
+        .transaction {
+            padding: 12px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transaction span {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .transaction .amount {
+            font-size: 18px;
+            color: #4caf50; /* Positive: Green */
+        }
+        .transaction .amount.negative {
+            color: #f44336; /* Negative: Red */
+        }
+        .transaction .label {
+            font-size: 16px;
+            color: #666;
+        }
+        .transaction .date {
+            font-size: 14px;
+            color: #aaa;
         }
     </style>
 </head>
@@ -41,8 +94,12 @@
     <div id="app">
         <h1>Willkommen, Maxim Getz</h1>
         <h2>Kontostand: <span id="balance">€4.956,40</span></h2>
-        <h3>Transaktionen</h3>
-        <ul id="transactions"></ul>
+        <div id="transactions"></div>
+    </div>
+
+    <!-- WebAuthn Authentication -->
+    <div id="auth">
+        <button id="login-btn">Mit Face ID einloggen</button>
     </div>
 
     <!-- JavaScript -->
@@ -52,23 +109,24 @@
             const app = document.getElementById("app");
             const balanceEl = document.getElementById("balance");
             const transactionsEl = document.getElementById("transactions");
+            const loginBtn = document.getElementById("login-btn");
 
-            let balance = 4956.40;  // Startwert des Kontostands
+            let balance = 4956.40;
 
             const transactions = [
-                { amount: +6500, label: "Nebula Gaming Sponsoring" },
-                { amount: -53.6, label: "McDonald’s" },
-                { amount: -120, label: "Spotify Premium" },
-                { amount: +200, label: "Kontoaufladung" },
-                { amount: -60, label: "Steam" },
-                { amount: -10, label: "App Store" },
-                { amount: -30, label: "Edeka" },
-                { amount: -25, label: "Aldi" },
-                { amount: +2000, label: "Lohnzahlung NAH.SH" },
-                { amount: +2000, label: "Lohnzahlung NAH.SH" },
-                { amount: -15, label: "Bäckerei" },
-                { amount: +2000, label: "Lohnzahlung NAH.SH" },
-                { amount: -40, label: "Rewe" }
+                { amount: +6500, label: "Nebula Gaming Sponsoring", date: "01.04.2025" },
+                { amount: -53.6, label: "McDonald’s", date: "02.04.2025" },
+                { amount: -120, label: "Spotify Premium", date: "03.04.2025" },
+                { amount: +200, label: "Kontoaufladung", date: "04.04.2025" },
+                { amount: -60, label: "Steam", date: "05.04.2025" },
+                { amount: -10, label: "App Store", date: "06.04.2025" },
+                { amount: -30, label: "Edeka", date: "07.04.2025" },
+                { amount: -25, label: "Aldi", date: "08.04.2025" },
+                { amount: +2000, label: "Lohnzahlung NAH.SH", date: "09.04.2025" },
+                { amount: +2000, label: "Lohnzahlung NAH.SH", date: "10.04.2025" },
+                { amount: -15, label: "Bäckerei", date: "11.04.2025" },
+                { amount: +2000, label: "Lohnzahlung NAH.SH", date: "12.04.2025" },
+                { amount: -40, label: "Rewe", date: "13.04.2025" }
             ];
 
             setTimeout(() => {
@@ -77,13 +135,52 @@
                 processTransactions();
             }, 2000);
 
+            loginBtn.addEventListener("click", async () => {
+                try {
+                    // WebAuthn API (dies benötigt einen Server, um die Challenge zu erhalten)
+                    const response = await fetch("/webauthn/login/challenge"); // Dies ist ein Beispiel-Endpunkt
+                    const challenge = await response.json();
+
+                    const credential = await navigator.credentials.get({
+                        publicKey: challenge
+                    });
+
+                    // Weiterverarbeitung der erfolgreichen Authentifizierung
+                    alert("Erfolgreich mit Face ID eingeloggt!");
+                    processTransactions();
+                } catch (error) {
+                    console.error("Fehler bei der Authentifizierung:", error);
+                }
+            });
+
             function processTransactions() {
                 transactions.forEach(tx => {
-                    const li = document.createElement("li");
-                    balance += tx.amount;  // Kontostand aktualisieren
-                    balanceEl.textContent = `€${balance.toFixed(2)}`; // Kontostand anpassen
-                    li.textContent = `${tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)} € – ${tx.label}`;
-                    transactionsEl.appendChild(li);
+                    const transactionEl = document.createElement("div");
+                    transactionEl.classList.add("transaction");
+
+                    // Kontostand aktualisieren
+                    balance += tx.amount;
+                    balanceEl.textContent = `€${balance.toFixed(2)}`;
+
+                    // Transaktionsdaten hinzufügen
+                    const amountEl = document.createElement("span");
+                    amountEl.classList.add("amount");
+                    amountEl.classList.add(tx.amount < 0 ? "negative" : "positive");
+                    amountEl.textContent = `${tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)} €`;
+
+                    const labelEl = document.createElement("span");
+                    labelEl.classList.add("label");
+                    labelEl.textContent = tx.label;
+
+                    const dateEl = document.createElement("span");
+                    dateEl.classList.add("date");
+                    dateEl.textContent = tx.date;
+
+                    transactionEl.appendChild(amountEl);
+                    transactionEl.appendChild(labelEl);
+                    transactionEl.appendChild(dateEl);
+
+                    transactionsEl.appendChild(transactionEl);
                 });
             }
         });
