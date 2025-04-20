@@ -144,6 +144,40 @@
             font-size: 14px;
             color: #888;
         }
+
+        /* Send Money Form */
+        #send-money-form {
+            margin-top: 30px;
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            text-align: center;
+        }
+
+        #send-money-form input {
+            background: #444;
+            color: #e0e0e0;
+            padding: 12px;
+            margin: 10px;
+            width: 90%;
+            border-radius: 8px;
+        }
+
+        #send-money-form button {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #send-money-form button:hover {
+            background-color: #e53935;
+        }
+
     </style>
 </head>
 <body>
@@ -165,6 +199,15 @@
     <div id="app">
         <h1>Willkommen, Maxim Getz</h1>
         <h2>Kontostand: <span id="balance">€4.956,40</span></h2>
+
+        <!-- Send Money Form -->
+        <div id="send-money-form">
+            <h3>Geld senden</h3>
+            <input type="number" id="send-amount" placeholder="Betrag (€)" />
+            <input type="text" id="recipient" placeholder="Empfänger" />
+            <button id="send-btn">Senden</button>
+        </div>
+
         <div id="transactions"></div>
     </div>
 
@@ -176,6 +219,9 @@
             const app = document.getElementById("app");
             const balanceEl = document.getElementById("balance");
             const transactionsEl = document.getElementById("transactions");
+            const sendBtn = document.getElementById("send-btn");
+            const sendAmount = document.getElementById("send-amount");
+            const recipient = document.getElementById("recipient");
             const loginBtn = document.getElementById("login-btn");
 
             const correctEmail = "Maxim.Getz@NBG.net";
@@ -248,6 +294,60 @@
                     transactionsEl.appendChild(transactionEl);
                 });
             }
+
+            // Geld senden
+            sendBtn.addEventListener("click", () => {
+                const amount = parseFloat(sendAmount.value);
+                const recipientName = recipient.value.trim();
+
+                if (isNaN(amount) || amount <= 0 || recipientName === "") {
+                    alert("Bitte geben Sie einen gültigen Betrag und Empfänger an.");
+                    return;
+                }
+
+                if (amount > balance) {
+                    alert("Nicht genug Guthaben.");
+                    return;
+                }
+
+                // Aktualisiere den Kontostand
+                balance -= amount;
+                balanceEl.textContent = `€${balance.toFixed(2)}`;
+
+                // Füge die Transaktion zur Historie hinzu
+                const transaction = {
+                    amount: -amount,
+                    label: `Geld senden an ${recipientName}`,
+                    date: new Date().toLocaleDateString()
+                };
+                transactions.push(transaction);
+
+                // Aktualisiere die Transaktionshistorie
+                const transactionEl = document.createElement("div");
+                transactionEl.classList.add("transaction");
+
+                const amountEl = document.createElement("span");
+                amountEl.classList.add("amount", "negative");
+                amountEl.textContent = `-${amount.toFixed(2)} €`;
+
+                const labelEl = document.createElement("span");
+                labelEl.classList.add("label");
+                labelEl.textContent = `Geld senden an ${recipientName}`;
+
+                const dateEl = document.createElement("span");
+                dateEl.classList.add("date");
+                dateEl.textContent = new Date().toLocaleDateString();
+
+                transactionEl.appendChild(amountEl);
+                transactionEl.appendChild(labelEl);
+                transactionEl.appendChild(dateEl);
+
+                transactionsEl.appendChild(transactionEl);
+
+                // Leere das Formular
+                sendAmount.value = "";
+                recipient.value = "";
+            });
         });
     </script>
 </body>
