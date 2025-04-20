@@ -12,10 +12,16 @@
             color: #e0e0e0; /* Light text */
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
+        /* Splash Screen */
         #splash-screen {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: #1e1e1e; /* Dark splash screen */
@@ -23,6 +29,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 10;
         }
 
         #splash-screen img {
@@ -35,9 +42,10 @@
             color: #e0e0e0;
         }
 
+        /* Login Screen */
         #login-screen {
             display: none;
-            position: fixed;
+            position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: #121212; /* Dark login screen */
@@ -45,6 +53,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+        }
+
+        #login-screen img {
+            width: 150px;
+            margin-bottom: 20px;
         }
 
         #login-screen input {
@@ -73,6 +86,7 @@
             background-color: #1a67c2;
         }
 
+        /* App Content */
         #app {
             display: none;
             max-width: 1200px;
@@ -141,6 +155,7 @@
 
     <!-- Login Screen -->
     <div id="login-screen">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Revolut_logo_2020.svg/1920px-Revolut_logo_2020.svg.png" alt="Revolut Logo" />
         <input type="email" id="email" placeholder="E-Mail" required />
         <input type="password" id="password" placeholder="Passwort" required />
         <button id="login-btn">Einloggen</button>
