@@ -47,6 +47,17 @@
             align-items: center;
         }
 
+        #login-screen input {
+            background: #333;
+            border: 1px solid #444;
+            padding: 12px;
+            margin: 10px 0;
+            width: 80%;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 18px;
+        }
+
         #login-btn {
             background-color: #2f84f7;
             border: none;
@@ -130,7 +141,9 @@
 
     <!-- Login Screen -->
     <div id="login-screen">
-        <button id="login-btn">Mit Face ID einloggen</button>
+        <input type="email" id="email" placeholder="E-Mail" required />
+        <input type="password" id="password" placeholder="Passwort" required />
+        <button id="login-btn">Einloggen</button>
     </div>
 
     <!-- App Content -->
@@ -138,11 +151,6 @@
         <h1>Willkommen, Maxim Getz</h1>
         <h2>Kontostand: <span id="balance">€4.956,40</span></h2>
         <div id="transactions"></div>
-    </div>
-
-    <!-- WebAuthn Authentication -->
-    <div id="auth">
-        <button id="login-btn">Mit Face ID einloggen</button>
     </div>
 
     <!-- JavaScript -->
@@ -154,6 +162,9 @@
             const balanceEl = document.getElementById("balance");
             const transactionsEl = document.getElementById("transactions");
             const loginBtn = document.getElementById("login-btn");
+
+            const correctEmail = "Maxim.Getz@NBG.net";
+            const correctPassword = "2202";
 
             let balance = 4956.40;
 
@@ -178,23 +189,17 @@
                 loginScreen.style.display = "block";  // Zeige Login Screen nach Splash
             }, 2000);
 
-            loginBtn.addEventListener("click", async () => {
-                try {
-                    // WebAuthn API (dies benötigt einen Server, um die Challenge zu erhalten)
-                    const response = await fetch("/webauthn/login/challenge"); // Dies ist ein Beispiel-Endpunkt
-                    const challenge = await response.json();
+            loginBtn.addEventListener("click", () => {
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
 
-                    const credential = await navigator.credentials.get({
-                        publicKey: challenge
-                    });
-
-                    // Weiterverarbeitung der erfolgreichen Authentifizierung
-                    alert("Erfolgreich mit Face ID eingeloggt!");
+                if (email === correctEmail && password === correctPassword) {
+                    alert("Erfolgreich eingeloggt!");
                     loginScreen.style.display = "none"; // Verstecke Login Screen
                     app.style.display = "block";  // Zeige Dashboard
                     processTransactions();
-                } catch (error) {
-                    console.error("Fehler bei der Authentifizierung:", error);
+                } else {
+                    alert("Falsche E-Mail oder Passwort.");
                 }
             });
 
