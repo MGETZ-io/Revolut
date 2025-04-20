@@ -300,53 +300,15 @@
                 const amount = parseFloat(sendAmount.value);
                 const recipientName = recipient.value.trim();
 
-                if (isNaN(amount) || amount <= 0 || recipientName === "") {
-                    alert("Bitte geben Sie einen gültigen Betrag und Empfänger an.");
-                    return;
+                if (recipientName && amount > 0 && balance >= amount) {
+                    balance -= amount;
+                    balanceEl.textContent = `€${balance.toFixed(2)}`;
+                    alert(`€${amount.toFixed(2)} an ${recipientName} gesendet!`);
+                    sendAmount.value = "";
+                    recipient.value = "";
+                } else {
+                    alert("Ungültiger Betrag oder unzureichendes Guthaben.");
                 }
-
-                if (amount > balance) {
-                    alert("Nicht genug Guthaben.");
-                    return;
-                }
-
-                // Aktualisiere den Kontostand
-                balance -= amount;
-                balanceEl.textContent = `€${balance.toFixed(2)}`;
-
-                // Füge die Transaktion zur Historie hinzu
-                const transaction = {
-                    amount: -amount,
-                    label: `Geld senden an ${recipientName}`,
-                    date: new Date().toLocaleDateString()
-                };
-                transactions.push(transaction);
-
-                // Aktualisiere die Transaktionshistorie
-                const transactionEl = document.createElement("div");
-                transactionEl.classList.add("transaction");
-
-                const amountEl = document.createElement("span");
-                amountEl.classList.add("amount", "negative");
-                amountEl.textContent = `-${amount.toFixed(2)} €`;
-
-                const labelEl = document.createElement("span");
-                labelEl.classList.add("label");
-                labelEl.textContent = `Geld senden an ${recipientName}`;
-
-                const dateEl = document.createElement("span");
-                dateEl.classList.add("date");
-                dateEl.textContent = new Date().toLocaleDateString();
-
-                transactionEl.appendChild(amountEl);
-                transactionEl.appendChild(labelEl);
-                transactionEl.appendChild(dateEl);
-
-                transactionsEl.appendChild(transactionEl);
-
-                // Leere das Formular
-                sendAmount.value = "";
-                recipient.value = "";
             });
         });
     </script>
